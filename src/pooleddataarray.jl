@@ -658,15 +658,15 @@ function PooledDataVecs{S,R<:Integer,N}(v1::AbstractArray{S,N},
                           v2)
 end
 
-function PooledDataVecs(v1::AbstractArray,
-                        v2::AbstractArray)
+function PooledDataVecs{R<:Integer}(v1::AbstractArray,
+                        v2::AbstractArray,
+                        r::Type{R} = DEFAULT_POOLED_REF_TYPE)
 
     ## Return two PooledDataVecs that share the same pool.
 
-    ## TODO: allow specification of REFTYPE
-    refs1 = Array(DEFAULT_POOLED_REF_TYPE, size(v1))
-    refs2 = Array(DEFAULT_POOLED_REF_TYPE, size(v2))
-    poolref = Dict{promote_type(eltype(v1), eltype(v2)), DEFAULT_POOLED_REF_TYPE}()
+    refs1 = Array(R, size(v1))
+    refs2 = Array(R, size(v2))
+    poolref = Dict{promote_type(eltype(v1), eltype(v2)), R}()
     maxref = 0
 
     # loop through once to fill the poolref dict
@@ -690,7 +690,7 @@ function PooledDataVecs(v1::AbstractArray,
     end
 
     # fill in newrefs
-    zeroval = zero(DEFAULT_POOLED_REF_TYPE)
+    zeroval = zero(R)
     for i = 1:length(v1)
         if isna(v1[i])
             refs1[i] = zeroval
